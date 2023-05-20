@@ -6,4 +6,4 @@ A small program to monitor trains. (including that pesky one)
   wget [hddIns] installer.lua
 ## OpenOS (.shrc method):
   wget [shrcIns] installer.lua
-installer
+  For both cases, then run installer.
