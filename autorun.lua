@@ -9,9 +9,8 @@ local x, y = gpu.getViewport()
 gpu.fill(1, 1, x, y, " ")
 
 local colours = {0x44CC00, 0xFFFF00, 0xB0B00F, 0xFF1100, 0xCC2200}
+local aspects = {}
 
-local function stop()
-end
 
 local function unparse(text)
     local out = {}
@@ -32,16 +31,26 @@ local function render(table)
     end
 end
 
-local function release()
-    while true do
+local blinkState = nil
+
+local function blink()
+    --Iterate over all lines
+    for i, l in pairs(aspects) do
+        --Iterate over all signals
+        for k, v in pairs(l) do
+            local idx = v["state"]
+            if idx == 2 or idx == 4 then
+                local x = (i*6) - 4
+                local last = gpu.setBackground(blinkState or colours[idx], true)
+                gpu.set(x + 3, k, " ")
+                gpu.setBackground(last)
+            end
+        end
     end
-    thread.create()
-    rs.setOutput(1, 15)
-    os.sleep(1)
-    rs.setOutput(1, 0)
+    if blinkState == 7 then blinkState = nil else blinkState = 7 end
 end
 
-local aspects = {}
+event.timer(0.5, blink, math.huge)
 
 while true do
     local name, addr, box, state = require("event").pullMultiple("aspect_changed", "interrupted", "redstone_changed")
